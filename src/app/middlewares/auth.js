@@ -1,0 +1,35 @@
+import jwt from 'jsonwebtoken';
+import authConfig from '../../config/auth.js';
+
+
+const authmiddlwares = (request, response, next) => {
+
+    const authToken = request.headers.authorization;
+
+    if(!authToken){
+        return response.status(401).json({error: "Token not provided"});
+    }
+
+    const token = authToken.split(' ')[1];
+
+    try {
+     jwt.verify(token, authConfig.secret, (error, decoded) => {
+        if(error){
+            throw Error();
+        } 
+        
+        request.userId = decoded.id;
+        request.userName = decoded.name;
+        request.userAdmin = decoded.admin;
+     });
+    }
+     catch (error) {
+        return response.status(401).json({error: "Token invalid"});
+    }
+
+    return next();
+
+};
+
+
+export default authmiddlwares;
