@@ -8,7 +8,9 @@ class Category extends Model {
       url: {
         type: Sequelize.VIRTUAL,
         get() {
-            return `http://localhost:3001/category-file/${this.path}`;
+            
+            return `${process.env.APP_URL || 'http://localhost:3001'}/category-file/${this.path}`;
+           
         },
       
     }},
