@@ -19,11 +19,19 @@ class ProductsController {
 
     const { name, price, category_id, offer } = request.body;
     
+    // Log para sabermos exatamente o que o Multer/Cloudinary está capturando
+    console.log('REQUEST FILE:', request.file);
+
     if (!request.file) {
       return response.status(400).json({ error: 'A imagem do produto é obrigatória.' });
     }
 
-    const urlImage = request.file.path;
+    // Garante que pega a URL do Cloudinary independente da propriedade usada pelo storage
+    const urlImage = request.file.path || request.file.secure_url;
+
+    if (!urlImage) {
+      return response.status(500).json({ error: 'Erro ao obter a URL da imagem do Cloudinary.' });
+    }
 
     const newProduct = await Product.create({
       name,
@@ -33,7 +41,6 @@ class ProductsController {
       path: urlImage
     });
 
-    // Garante que a resposta devolve a URL correta sem duplicações
     const productResponse = newProduct.toJSON();
     productResponse.url = urlImage.startsWith('http') 
       ? urlImage 
