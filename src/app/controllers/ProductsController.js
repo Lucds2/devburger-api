@@ -91,18 +91,16 @@ class ProductsController {
         ],
     });
 
-    // Mapeia os produtos para garantir que a URL da imagem venha limpa do Cloudinary
     const formattedProducts = products.map(product => {
       const prod = product.toJSON();
-      if (prod.path && prod.path.startsWith('http')) {
-        prod.url = prod.path; // Se for do Cloudinary, usa direto
-      } else if (prod.path) {
-        prod.url = `${request.protocol}://${request.get('host')}/product-file/${prod.path}`;
-      }
+      // Se o path já for uma URL do Cloudinary, a propriedade url recebe ele diretamente
+      prod.url = prod.path.startsWith('http') 
+        ? prod.path 
+        : `${request.protocol}://${request.get('host')}/product-file/${prod.path}`;
       return prod;
     });
 
-    return response.status(200).json({ products: formattedProducts });
+    return response.status(200).json(formattedProducts);
   }
 }
 
