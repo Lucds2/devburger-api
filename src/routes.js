@@ -15,15 +15,15 @@ const routes = new Router();
 const upload = multer(multerConfig);
 
 
-// Rota temporária para limpar a tabela de produtos
-routes.get('/products/delete-all', async (req, res) => {
-  try {
-    await Product.destroy({ where: {}, truncate: true, cascade: true });
-    return res.status(200).json({ message: 'Todos os produtos foram apagados com sucesso!' });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
-  }
-});
+// // Rota temporária para limpar a tabela de produtos
+// routes.get('/products/delete-all', async (req, res) => {
+//   try {
+//     await Product.destroy({ where: {}, truncate: true, cascade: true });
+//     return res.status(200).json({ message: 'Todos os produtos foram apagados com sucesso!' });
+//   } catch (error) {
+//     return res.status(500).json({ error: error.message });
+//   }
+// });
 
 // Rotas Públicas
 routes.post('/user', UserController.store);
