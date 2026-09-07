@@ -16,7 +16,7 @@ const upload = multer(multerConfig);
 
 
 // Rota temporária para limpar a tabela de produtos
-routes.delete('/products/delete-all', async (req, res) => {
+routes.get('/products/delete-all', async (req, res) => {
   try {
     await Product.destroy({ where: {}, truncate: true, cascade: true });
     return res.status(200).json({ message: 'Todos os produtos foram apagados com sucesso!' });
