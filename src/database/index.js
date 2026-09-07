@@ -19,9 +19,11 @@ this.mongo();
         models.map((models)=> models.init(this.connection)).map((models)=> models.associate && models.associate(this.connection.models));
     }
 
-    mongo(){
-        this.mongooseConnection = mongoose.connect('mongodb://localhost:27017/devburger',);
-    }
+    mongo() {
+    this.mongooseConnection = mongoose.connect(
+        process.env.MONGO_URL || 'mongodb://localhost:27017/devburger'
+    );
+}
 }
 
 
