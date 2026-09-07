@@ -3,7 +3,7 @@ import UserController from "./app/controllers/UserController.js";
 import SessionController from "./app/controllers/SessionController.js";
 import ProductsController from "./app/controllers/ProductsController.js";
 import multer from "multer";
-import multerConfig from "./config/multer.cjs";
+import multerConfig from "./config/multer.js";
 import authmiddlwares from "./app/middlewares/auth.js";
 import CategoryController from "./app/controllers/CategoryController.js";
 import adminMiddlwares from "./app/middlewares/admin.js";
