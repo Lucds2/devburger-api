@@ -23,7 +23,6 @@ class ProductsController {
       return response.status(400).json({ error: 'A imagem do produto é obrigatória.' });
     }
 
-    // O Cloudinary disponibiliza a URL pública direto em request.file.path
     const urlImage = request.file.path;
 
     const newProduct = await Product.create({
@@ -31,10 +30,16 @@ class ProductsController {
       price: Number(price),
       category_id: Number(category_id),
       offer: offer === 'true' || offer === true,
-      path: urlImage // Salva a URL completa do Cloudinary no banco
+      path: urlImage
     });
 
-    return response.status(201).json(newProduct);
+    // Garante que a resposta devolve a URL correta sem duplicações
+    const productResponse = newProduct.toJSON();
+    productResponse.url = urlImage.startsWith('http') 
+      ? urlImage 
+      : `${request.protocol}://${request.get('host')}/product-file/${urlImage}`;
+
+    return response.status(201).json(productResponse);
   }
 
   async update(request, response) {
@@ -56,7 +61,7 @@ class ProductsController {
 
     let path;
     if (request.file) {
-      path = request.file.path; // Pega a nova URL do Cloudinary se houver upload
+      path = request.file.path;
     }
 
     await Product.update(
@@ -65,7 +70,7 @@ class ProductsController {
         price,
         category_id,
         offer,
-        path, 
+        ...(path && { path }), 
       },
       {
         where: { id },
@@ -85,7 +90,19 @@ class ProductsController {
             },
         ],
     });
-    return response.status(200).json({ products });
+
+    // Mapeia os produtos para garantir que a URL da imagem venha limpa do Cloudinary
+    const formattedProducts = products.map(product => {
+      const prod = product.toJSON();
+      if (prod.path && prod.path.startsWith('http')) {
+        prod.url = prod.path; // Se for do Cloudinary, usa direto
+      } else if (prod.path) {
+        prod.url = `${request.protocol}://${request.get('host')}/product-file/${prod.path}`;
+      }
+      return prod;
+    });
+
+    return response.status(200).json({ products: formattedProducts });
   }
 }
 
