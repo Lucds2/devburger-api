@@ -3,10 +3,8 @@ const { resolve } = require("node:path");
 const { v4 } = require("uuid");
 const fs = require("fs");
 
-// Caminho exato da pasta uploads na raiz
-const uploadFolder = resolve(__dirname, "..", "..", "uploads");
+const uploadFolder = resolve(process.cwd(), "uploads");
 
-// Garante que a pasta uploads seja criada se não existir no Render
 if (!fs.existsSync(uploadFolder)) {
   fs.mkdirSync(uploadFolder, { recursive: true });
 }
