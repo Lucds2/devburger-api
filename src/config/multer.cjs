@@ -1,20 +1,15 @@
-const multer = require("multer");
-const { resolve } = require("node:path");
-const { v4 } = require("uuid");
-const fs = require("fs");
+import multer from 'multer';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import cloudinary from './cloudinary.js';
 
-const uploadFolder = resolve(process.cwd(), "uploads");
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'devburger', // Nome da pasta que será criada automaticamente lá no seu Cloudinary
+    allowed_formats: ['jpg', 'png', 'jpeg', 'webp'],
+  },
+});
 
-if (!fs.existsSync(uploadFolder)) {
-  fs.mkdirSync(uploadFolder, { recursive: true });
-}
+const upload = multer({ storage });
 
-module.exports = {
-  storage: multer.diskStorage({
-    destination: uploadFolder,
-    filename: (req, file, cb) => {
-      const uniqueName = `${v4()}-${file.originalname}`;
-      return cb(null, uniqueName);
-    },
-  }),
-};
+export default upload;

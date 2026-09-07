@@ -6,7 +6,7 @@ class ProductsController {
   async store(request, response){
     const schema = Yup.object({
       name: Yup.string().required(),
-      price: Yup.mixed().required(), // Aceita string numérica do FormData ou número
+      price: Yup.mixed().required(),
       category_id: Yup.mixed().required(),
       offer: Yup.mixed().required()
     });
@@ -23,57 +23,58 @@ class ProductsController {
       return response.status(400).json({ error: 'A imagem do produto é obrigatória.' });
     }
 
-    const filename = request.file.filename;
+    // O Cloudinary disponibiliza a URL pública direto em request.file.path
+    const urlImage = request.file.path;
 
     const newProduct = await Product.create({
       name,
       price: Number(price),
       category_id: Number(category_id),
       offer: offer === 'true' || offer === true,
-      path: filename
+      path: urlImage // Salva a URL completa do Cloudinary no banco
     });
 
     return response.status(201).json(newProduct);
   }
 
-   async update(request, response) {
-  const schema = Yup.object({
-    name: Yup.string(),
-    price: Yup.number(),
-    category_id: Yup.number(),
-    offer: Yup.boolean(),
-  });
+  async update(request, response) {
+    const schema = Yup.object({
+      name: Yup.string(),
+      price: Yup.number(),
+      category_id: Yup.number(),
+      offer: Yup.boolean(),
+    });
 
-  try {
-    await schema.validate(request.body, { abortEarly: false });
-  } catch (error) {
-    return response.status(400).json({ errors: error.errors });
-  }
-
-  const { name, price, category_id, offer } = request.body;
-  const { id } = request.params;
-
-  
-  let path;
-  if (request.file) {
-    path = request.file.filename;
-  }
-
-  await Product.update(
-    {
-      name,
-      price,
-      category_id,
-      offer,
-      path, 
-    },
-    {
-      where: { id },
+    try {
+      await schema.validate(request.body, { abortEarly: false });
+    } catch (error) {
+      return response.status(400).json({ errors: error.errors });
     }
-  );
 
-  return response.status(200).json({ message: 'Product updated successfully' });
-}
+    const { name, price, category_id, offer } = request.body;
+    const { id } = request.params;
+
+    let path;
+    if (request.file) {
+      path = request.file.path; // Pega a nova URL do Cloudinary se houver upload
+    }
+
+    await Product.update(
+      {
+        name,
+        price,
+        category_id,
+        offer,
+        path, 
+      },
+      {
+        where: { id },
+      }
+    );
+
+    return response.status(200).json({ message: 'Product updated successfully' });
+  }
+
   async index(request, response){
     const products = await Product.findAll({
         include: [
@@ -86,10 +87,6 @@ class ProductsController {
     });
     return response.status(200).json({ products });
   }
-  
 }
-
-
-
 
 export default new ProductsController();
