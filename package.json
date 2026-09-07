@@ -30,10 +30,7 @@
     "uuid": "^14.0.1",
     "yup": "^1.7.1"
   },
-  "scripts": {
-  "start": "node src/server.js",
-  "dev": "nodemon src/server.js"
-},
+
   "devDependencies": {
     "@biomejs/biome": "2.5.8",
     "sequelize-cli": "^6.6.5"
